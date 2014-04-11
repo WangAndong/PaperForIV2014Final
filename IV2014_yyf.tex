@@ -293,7 +293,8 @@ Based on Rodriguez matrix, the rotation matrix can be written as
 
 Substituting (\ref{eq:Rodriguez_R}) for (\ref{eq:vp}), the equation can be
 \begin{equation}
-(\mathbf{I}-\mathbf{S})\mathbf{K}^{-1}(\mathbf{l}_1\times \mathbf{l}_2) = \lambda (\mathbf{I}+\mathbf{S})\mathbf{e}_2
+(\mathbf{I}-\mathbf{S})\mathbf{K}^{-1}(\mathbf{l}_1\times \mathbf{l}_2)
+= \lambda (\mathbf{I}+\mathbf{S})\hat{\mathbf{d}}_1
 \label{eq:linear}
 \end{equation}
 
@@ -348,25 +349,24 @@ As the rotation matrix is given, only two tracked points $\mathbf{p}_1,\mathbf{p
 \subsection{Likelihood measure}
 To measure the likelihood $p(\mathbf{Z}_{RSF} | x_k^i)$ is to measure the observation errors for the features.
 \begin{equation}
-E= E(\mathbf{l}) + \lambda E(\mathbf{p})
+E= E_\mathbf{l} + \lambda E_\mathbf{p}
 \end{equation}
 
 For a line segment, it is provided by its length plus the distance between line segment and its direction.
 \begin{equation}
-E(\mathbf{l}) = \sum_{i} \left(l_{i_1}^2+l_{i_2}^2\right) \cdot d^2(\mathbf{l}_i,\hat{\mathbf{d}}_i)
+E_\mathbf{l} = \sum_{i} \left(l_{i_1}^2+l_{i_2}^2\right) \cdot d^2(\mathbf{l}_i,\hat{\mathbf{d}}_i)
 \end{equation}
 where $l_{i_1},l_{i_2}$ are the first and second element of $\mathbf{l}_i$, and $l_{i_1}^2+l_{i_2}^2$ is the square of the length.
 
 For a feature point, it is defined using the distance between the point and that projected by the matched point in the successive frame.
 \begin{equation}
-E(\mathbf{p}) = \sum_{i} d^2(\mathbf{m}_{i,k}, \mathbf{m}_{i,k-1})
+E_\mathbf{p} = \sum_{i} d^2(\mathbf{p}, \mathbf{p}^\prime)
 \end{equation}
 where
 \begin{equation}
-\begin{split}
-d^2(\mathbf{m}_{i,k}, \mathbf{m}_{i,k-1}) & = \left\| \mathbf{m}_{i,k}-\mathbf{F} \mathbf{m}_{i,k-1} \right\|^2 \\
- & + \left\| \mathbf{m}_{i,k-1}- \mathbf{F}^T\mathbf{m}_{i,k} \right\|^2
-\end{split}
+d^2(\mathbf{p}, \mathbf{p}^\prime)
+= \left\| \mathbf{p} - \mathbf{F} \mathbf{p}^\prime \right\|^2 \\
++ \left\| \mathbf{p}^\prime - \mathbf{F}^T\mathbf{p} \right\|^2
 \end{equation}
 
 \subsection{Robustness Concerns}

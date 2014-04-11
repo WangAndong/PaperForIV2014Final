@@ -201,11 +201,11 @@ $\mathbf{R}_r$ is the rotation of the road in world coordinate frame calculated 
                                 0 & 0 & 1
                     \end{bmatrix}
 \end{equation}
-So the road coordinate is 
+So the road coordinate is
 \begin{equation}
 \begin{bmatrix} \mathbf{X}_r & \mathbf{Y}_r & \mathbf{Z}_r \end{bmatrix}
 = \mathbf{R}_r
-\begin{bmatrix} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \end{bmatrix} 
+\begin{bmatrix} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \end{bmatrix}
 \end{equation}
 where $\mathbf{e}_1=(1,0,0)^T$, $\mathbf{e}_2=(0,1,0)^T$, $\mathbf{e}_3=(0,0,1)^T$ are the directions of x,y and z in world coordinate frame.
 
@@ -358,7 +358,7 @@ E_\mathbf{l} = \sum_{i} \left(l_{i_1}^2+l_{i_2}^2\right) \cdot d^2(\mathbf{l}_i,
 \end{equation}
 where $l_{i_1},l_{i_2}$ are the first and second element of $\mathbf{l}_i$, and $l_{i_1}^2+l_{i_2}^2$ is the square of the length.
 
-For a feature point, it is defined using the distance between the point and that projected by the matched point in the successive frame.111
+For a feature point, it is defined using the distance between the point and that projected by the matched point in the successive frame.
 \begin{equation}
 E_\mathbf{p} = \sum_{i} d^2(\mathbf{p}, \mathbf{p}^\prime)
 \end{equation}

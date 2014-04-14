@@ -191,51 +191,83 @@ In the next section, we define a distance measure $\mathbf{d}$ in selecting and 
 \section{Algorithm Details}
 %Here the details of the algorithm is presented. The detection of RSF is given in the first place. After that a robust pose estimation algorithm based on RANSAC is explained, followed by the use of the map in RSF or RSFs prediction. Finally, some implementations are presented, which can higher the robustness of the system.
 
-\subsection{Notations and Coordinate Frames}
-Before going to the details, Some notations and coordinate frames are presented first. The road coordinate frame is made of the road's longitude, latitude and vertical directions, which are $X_r$, $Y_r$ and $Z_r$. For the vehicle frame, the origin is the center point of the rear axle, $X_v$ is to the right side, $Y_v$ is to the front and $Z_v$ is to the top. For the camera frame, the origin is the center point, $X_c$, $Y_c$ and $Z_c$ are to the left, down and front.
+%\subsection{Notations and Coordinate Frames}
+%Before going to the details, Some notations and coordinate frames are presented first. The road coordinate frame is made of the road's longitude, latitude and vertical directions, which are $X_r$, $Y_r$ and $Z_r$. For the vehicle frame, the origin is the center point of the rear axle, $X_v$ is to the right side, $Y_v$ is to the front and $Z_v$ is to the top. For the camera frame, the origin is the center point, $X_c$, $Y_c$ and $Z_c$ are to the left, down and front.
+%
+%$\mathbf{R}_r$ is the rotation of the road in world coordinate frame calculated by the angle $\theta$, which means
+%\begin{equation}
+%\mathbf{R}_r =\begin{bmatrix}   cos\theta & -sin\theta & 0 \\
+%                                sin\theta & cos\theta & 0 \\
+%                                0 & 0 & 1
+%                    \end{bmatrix}
+%\end{equation}
+%So the road coordinate is
+%\begin{equation}
+%\begin{bmatrix} \mathbf{X}_r & \mathbf{Y}_r & \mathbf{Z}_r \end{bmatrix}
+%= \mathbf{R}_r
+%\begin{bmatrix} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \end{bmatrix}
+%\end{equation}
+%where $\mathbf{e}_1=(1,0,0)^T$, $\mathbf{e}_2=(0,1,0)^T$, $\mathbf{e}_3=(0,0,1)^T$ are the directions of x,y and z in world coordinate frame.
+%
+%$\mathbf{x}_{v} = \{\mathbf{R}_{v}, \mathbf{s}_{v}\}$ is the pose of the vehicle, where $\mathbf{R}_v$ is the orientation and $\mathbf{s}_v$ means the position. $\mathbf{x}_{c} = \{\mathbf{R}_{c}, \mathbf{s}_{c}\}$ is the pose of the camera. The coordinate transformation is provided by
+%\begin{equation}
+%\mathbf{R}_{c} = \mathbf{R}_v \mathbf{R}_{cv}
+%\label{eq:R_c}
+%\end{equation}
+%\begin{equation}
+%\mathbf{s}_{c} = \mathbf{s}_v + \mathbf{R}_{v} \mathbf{s}_{cv}
+%\label{eq:S_c}
+%\end{equation}
+%where $\mathbf{R}_{cv}$ and $\mathbf{s}_{cv}$ are the orientation and position of the camera in vehicle coordinate frame, which is well calibrated.
+%
+%Let $\mathbf{P}=\mathbf{K}[\mathbf{R}|\mathbf{t}]$ is the projection matrix of the camera, where $\mathbf{K}$ is the intrinsic matrix, which is well calibrated, $\mathbf{R}=\mathbf{R}_c^T$ is the rotation matrix, and $\mathbf{t}=-\mathbf{R}_c\mathbf{s}_c$ is the translation vector.
 
-$\mathbf{R}_r$ is the rotation of the road in world coordinate frame calculated by the angle $\theta$, which means
+\subsection{Pose Prediction and Coordinate Transformation}
+Let $\mathbf{x}_{v} = \{\mathbf{R}_{v}, \mathbf{s}_{v}\}$ be a vehicle pose with respect to a world coordinate system, where $\mathbf{R}_{v}$ is a rotation matrix of the vehicle orientation, and $\mathbf{s}_{v}$ is a translation vector (i.e. vehicle position).
+A vehicle frame is defined as a right-hand coordinate system with its origin at the center point of the rear axle, its $x$, $y$ and $z$ axes point to the right, front and up respectively. Let $\mathbf{e}_1=(1,0,0)^T$, $\mathbf{e}_2=(0,1,0)^T$, $\mathbf{e}_3=(0,0,1)^T$ be the three unit vectors, the vehicle frame at a world coordinate system can be represented as
+
 \begin{equation}
-\mathbf{R}_r =\begin{bmatrix}   cos\theta & -sin\theta & 0 \\
-                                sin\theta & cos\theta & 0 \\
-                                0 & 0 & 1
-                    \end{bmatrix}
-\end{equation}
-So the road coordinate is
-\begin{equation}
-\begin{bmatrix} \mathbf{X}_r & \mathbf{Y}_r & \mathbf{Z}_r \end{bmatrix}
-= \mathbf{R}_r
+\begin{bmatrix} \mathbf{d}_x & \mathbf{d}_y & \mathbf{d}_z \end{bmatrix}
+= \mathbf{R}_v
 \begin{bmatrix} \mathbf{e}_1 & \mathbf{e}_2 & \mathbf{e}_3 \end{bmatrix}
 \end{equation}
-where $\mathbf{e}_1=(1,0,0)^T$, $\mathbf{e}_2=(0,1,0)^T$, $\mathbf{e}_3=(0,0,1)^T$ are the directions of x,y and z in world coordinate frame.
 
-$\mathbf{x}_{v} = \{\mathbf{R}_{v}, \mathbf{s}_{v}\}$ is the pose of the vehicle, where $\mathbf{R}_v$ is the orientation and $\mathbf{s}_v$ means the position. $\mathbf{x}_{c} = \{\mathbf{R}_{c}, \mathbf{s}_{c}\}$ is the pose of the camera. The coordinate transformation is provided by
+Assuming a linear vehicle motion model, a vehicle pose $\hat{\mathbf{x}}_{v,k}=\{\hat{\mathbf{R}}_{v,k},\hat{\mathbf{s}}_{v,k}\}$ at frame $k$ can be predicted as below.
+
 \begin{equation}
-\mathbf{R}_{c} = \mathbf{R}_v \mathbf{R}_{cv}
+\hat{\mathbf{R}}_{v,k}=\mathbf{R}_{rel}\mathbf{R}_{v,k-1}=\left(\mathbf{R}_{v,k-1}\mathbf{R}_{v,k-2}^T\right)\mathbf{R}_{v,k-1}\\
+\label{eq:R_t_predict}
+\end{equation}
+\begin{equation}
+\hat{\mathbf{s}}_{v,k}= \mathbf{s}_{v,k-1} + \hat{\mathbf{d}}_{y,k} \int_{t_{k-1}}^{t_k}{v_t}\,dt
+\end{equation}
+
+where $\hat{\mathbf{d}}_{y,k}=\hat{\mathbf{R}}_{v,k}\mathbf{e}_2$ is a predicted vehicle's heading of frame $k$, $v$ is the speed detected from a wheel encoder.
+
+A camera is rigidly mounted on the vehicle with its geometries well calibrated with the vehicle frame. Thus, a coordinate at the vehicle frame can be transformed to the image plane on the following projection matrix.
+
+\begin{equation}
+\mathbf{P}_{vc}=\mathbf{K}[\mathbf{R}_{cv}^T|-\mathbf{R}_{cv}^T\mathbf{s}_{cv}]
+\end{equation}
+
+where $\mathbf{K}$ is the camera's intrinsic matrix, $\mathbf{R}_{cv}$ and $\mathbf{s}_{cv}$ are the rotation matrix and translation vector of the camera in vehicle coordinate frame.
+
+Let $\mathbf{x}_{c} = \{\mathbf{R}_{c}, \mathbf{s}_{c}\}$ denote for a camera pose with respect to the world coordinate system. With the vehicle pose and calibration parameters, a camera pose at the frame $k$ is thus predicted as
+
+\begin{equation}
+\hat{\mathbf{R}}_{c,k} = \hat{\mathbf{R}}_{v,k} \mathbf{R}_{cv}
 \label{eq:R_c}
 \end{equation}
 \begin{equation}
-\mathbf{s}_{c} = \mathbf{s}_v + \mathbf{R}_{v} \mathbf{s}_{cv}
+\hat{\mathbf{s}}_{c,k} = \hat{\mathbf{s}}_{v,k} + \hat{\mathbf{R}}_{v,k} \mathbf{s}_{cv}
 \label{eq:S_c}
 \end{equation}
-where $\mathbf{R}_{cv}$ and $\mathbf{s}_{cv}$ are the orientation and position of the camera in vehicle coordinate frame, which is well calibrated.
 
-Let $\mathbf{P}=\mathbf{K}[\mathbf{R}|\mathbf{t}]$ is the projection matrix of the camera, where $\mathbf{K}$ is the intrinsic matrix, which is well calibrated, $\mathbf{R}=\mathbf{R}_c^T$ is the rotation matrix, and $\mathbf{t}=-\mathbf{R}_c\mathbf{s}_c$ is the translation vector.
+Subsequently, a geometric primitive at the world coordinate system, e.g. a map object, can be transformed on the image frame on the following projection matrix.
 
-\subsection{Prediction}
-The pose of the vehicle $\mathbf{x}_{v,k} = \{\mathbf{R}_{v,k}, \mathbf{s}_{v,k}\}$ in frame $k$ can be predicted by a vehicle motion model. In this paper, the model is assumed to be linear, which means the change of the rotation is linear
 \begin{equation}
-\hat{\mathbf{R}}_{v,k}=\mathbf{R}_{rel}\mathbf{R}_{v,k-1}=\left(\mathbf{R}_{v,k-1}\mathbf{R}_{v,k-2}^T\right)\mathbf{R}_{v,k-1}
-\label{eq:R_t_predict}
+\mathbf{\hat{P}_{c}}=\mathbf{K}[\hat{\mathbf{R}}_{c,k}^T|-\hat{\mathbf{R}}_{c,k}^T\hat{\mathbf{s}}_{c,k}]
 \end{equation}
-
-The position is predicted using a linear motion assumption
-\begin{equation}
-\hat{\mathbf{s}}_{v,k}= \mathbf{s}_{v,k-1} + \hat{\mathbf{d}}_{v,k} \int_{t_{k-1}}^{t_k}{v_t}\,dt
-\end{equation}
-where $\hat{\mathbf{d}}_k$ is the vehicle's heading provided by $\hat{\mathbf{R}}_{v,k}$, $t_k$ and $t_{k-1}$ are the time of frame $k$ and $k-1$, $v$ is the speed detected from an encoder on the wheel.
-
-Combining (\ref{eq:R_c}) and (\ref{eq:S_c}), the pose of the camera is calculated. Then we get the camera's field of view on the map to find out the direction of the road in a straight road or directions of the roads in the intersection. For the intersection situation, the map projected onto the image and divide the image into several zones for line classification as shown in Fig. \ref{fig:map_based_prediction}.
 
 \subsection{Distance Measure for Line Classification}
 To classify the line segments is to calculate the distance between the line segments and the directions provided by the roads. For straight road situation, there is only one rotation of the road for the image. For intersection situation, since the image is separated into several zones and every zone matches with only one road, each line segment matches with one rotation.
@@ -365,9 +397,10 @@ E_\mathbf{p} = \sum_{i} d^2(\mathbf{p}, \mathbf{p}^\prime)
 where
 \begin{equation}
 d^2(\mathbf{p}, \mathbf{p}^\prime)
-= \left\| \mathbf{p} - \mathbf{F} \mathbf{p}^\prime \right\|^2 \\
-+ \left\| \mathbf{p}^\prime - \mathbf{F}^T\mathbf{p} \right\|^2
+= d^2 (\mathbf{p}, \mathbf{F} \mathbf{p}^\prime)
++ d^2 (\mathbf{p}^\prime, \mathbf{F}^T\mathbf{p}) \\
 \end{equation}
+Here $d^2 (\mathbf{p}, \mathbf{F} \mathbf{p}^\prime)$ is the square of distance from $p$ to the epipolar line $\mathbf{F} \mathbf{p}^\prime$.
 
 \subsection{Robustness Concerns}
 As addressed previously, in estimating a vehicle (or camera) pose, the typical sample of RSF should contains at least three line segments $\mathbf{l}_1,\mathbf{l}_2,\mathbf{l}_3$ with $\mathbf{d}_1=\mathbf{d}_2,\mathbf{d}_1\neq \mathbf{d}_3$, and two points tracked from the previous frame (see Fig. \ref{fig:features_for_estimation}).

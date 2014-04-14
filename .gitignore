@@ -8,6 +8,7 @@
 *.log
 *.blg
 IV2014_yyf.pdf
+*.sav
 
 *.pydevproject
 .project

@@ -51,7 +51,7 @@ Monocular Visual Localization using Road Structural Features
 
 
 \begin{abstract}
-Precise localization is an essential issue for autonomous driving applications, where GPS-based systems are challenged to meet requirements such as lane-level accuracy. This paper introduces a new visual-based localization approach in dynamic traffic environments, focusing on and exploiting properties of structured roads like straight roads or intersections. Such environments show several line segments on lane markings, curbs, poles, building edges, etc., which demonstrate the road's longitude, latitude and vertical directions. Based on this observation, we define a Road Structural Feature (RSF) as sets of segments along three perpendicular axes together with feature points. At each video frame, the proper road structure (or multiple road structures in case of a road intersection) is predicted based on the geometric information given by a 2D map. The RSF is then detected from line segments and points extracted from the image, and used to estimate the pose of the vehicle. Experiments are conducted using video streams collected on major roads in downtown Beijing, which are structured and with intense dynamic traffic. GPS/IMU data have been collected and synchronized with the video streams as a reference in validation. The results show good performance compared with that of a more traditional visual odometry method. Future work will be addressed on using visual approach to improve GPS localization accuracy.
+Precise localization is an essential issue for autonomous driving applications, where GPS-based systems are challenged to meet requirements such as lane-level accuracy. This paper introduces a new visual-based localization approach in dynamic traffic environments, focusing on and exploiting properties of structured roads like straight roads or intersections. Such environments show several line segments on lane markings, curbs, poles, building edges, etc., which demonstrate the road's longitude, latitude and vertical directions. Based on this observation, we define a Road Structural Feature (RSF) as sets of segments along three perpendicular axes together with feature points. At each video frame, the proper road structure (or multiple road structures in case of an intersection) is predicted based on the geometric information given by a 2D map. The RSF is then detected from line segments and points extracted from the image, and used to estimate the pose of the vehicle. Experiments are conducted using video streams collected on major roads in downtown Beijing, which are structured and with intense dynamic traffic. GPS/IMU data have been collected and synchronized with the video streams as a reference in validation. The results show good performance compared with that of a more traditional visual odometry method. Future work will be addressed on using visual approach to improve GPS localization accuracy.
 \end{abstract}
 
 
@@ -452,13 +452,13 @@ Since the proposed method uses a 2D map, while libviso2 doesn't, an additional e
 
 \begin{figure}[t]
 \centering
- \begin{minipage}[t]{0.48\linewidth}
+ \begin{minipage}[t]{0.58\linewidth}
     \centering
     \includegraphics[width=1\textwidth]{source//Final//T_result_in_map_Frame200_1049.pdf}
     \label{fig:another_T_in_map}
   \end{minipage}%
   \hfill
- \begin{minipage}[t]{0.48\linewidth}
+ \begin{minipage}[t]{0.42\linewidth}
     \centering
     \includegraphics[width=1\textwidth]{source//Final//T_result_Frame200_1049.pdf}
     \label{fig:another_T_result}

@@ -40,9 +40,9 @@ Monocular Visual Localization using Road Structural Features
 
 \author{Yufeng Yu$^{*}$, Huijing Zhao$^{*}$, Franck Davoine$^{+}$, Jinshi Cui$^{*}$, Hongbin Zha$^{*}$
 \thanks{$^{*}$Y. Yu, H. Zhao, J. Cui and H. Zha are with the State Key Lab of Machine Perception (MOE), Peking University, Beijing, China. {\tt\small yuyufeng at pku.edu.cn}}
-\thanks{$^{+}$F. Davoine is with CNRS, LIAMA Sino-French Laboratory, Beijing, China.}%
+\thanks{$^{+}$F. Davoine is with CNRS, LIAMA Sino-French Laboratory, Beijing, China.}
+\thanks{This work is partially supported by the Hi-Tech Research and Development Program of China [2012AA011801], the NSFC-ANR Grants [61161130528] , and the NSFC Grants [91120010].}
 }
-
 
 \begin{document}
 \maketitle
@@ -51,7 +51,7 @@ Monocular Visual Localization using Road Structural Features
 
 
 \begin{abstract}
-Precise localization is an essential issue for autonomous driving applications, where GPS-based systems are challenged to meet requirements such as lane-level accuracy. This paper introduces a new visual-based localization approach in dynamic traffic environments, focusing on and exploiting properties of structured roads like straight roads or intersections. Such environments show several line segments on lane markings, curbs, poles, building edges, etc., which demonstrate the road's longitude, latitude and vertical directions. Based on this observation, we define a Road Structural Feature (RSF) as sets of segments along three perpendicular axes together with some feature points. At each video frame, the proper road structure (or multiple road structures in case of a road intersection) is predicted based on the geometric information given by a 2D map. The RSF is then detected from line segments and points extracted from the image, and used to estimate the pose of the vehicle. Experiments are conducted using video streams collected on major roads in downtown Beijing, which are structured and with intense dynamic traffic. GPS/IMU data have been collected and synchronized with the video streams as a reference in validation. The results show good performance compared with that of a more traditional visual odometry method. Future work will be addressed on using visual approach to improve GPS localization accuracy.
+Precise localization is an essential issue for autonomous driving applications, where GPS-based systems are challenged to meet requirements such as lane-level accuracy. This paper introduces a new visual-based localization approach in dynamic traffic environments, focusing on and exploiting properties of structured roads like straight roads or intersections. Such environments show several line segments on lane markings, curbs, poles, building edges, etc., which demonstrate the road's longitude, latitude and vertical directions. Based on this observation, we define a Road Structural Feature (RSF) as sets of segments along three perpendicular axes together with feature points. At each video frame, the proper road structure (or multiple road structures in case of a road intersection) is predicted based on the geometric information given by a 2D map. The RSF is then detected from line segments and points extracted from the image, and used to estimate the pose of the vehicle. Experiments are conducted using video streams collected on major roads in downtown Beijing, which are structured and with intense dynamic traffic. GPS/IMU data have been collected and synchronized with the video streams as a reference in validation. The results show good performance compared with that of a more traditional visual odometry method. Future work will be addressed on using visual approach to improve GPS localization accuracy.
 \end{abstract}
 
 
@@ -152,13 +152,13 @@ In this research, a visual-based localization method is proposed by making use o
 \end{figure}
 
 \subsubsection{Road structure prediction}
-Now a day, many commercial maps are publicly available, such as the OpenStreetMap. With these maps, road lines at a predicted vehicle position are retrieved, and a road structure with three orthogonal axes is subsequently proposed as illustrated in Fig. \ref{fig:map_based_prediction} defining the longitudinal, lateral, and vertical directions of the road. The three orthogonal axes can be further projected onto the image frame according to the extrinsic and intrinsic calibration parameters of the camera, with which the line features are selected and discriminated in the next step. At an intersection scene, several road structures are predicted in similar ways, and the image frame is subsequently partitioned into several zones corresponding to each predicted structure as illustrated in Fig. \ref{fig:intersection}.
+Nowadays, several editable maps are publicly available, such as OpenStreetMap. With these maps, road lines at a predicted vehicle position can be retrieved, and a road structure with three orthogonal axes is subsequently proposed as illustrated in Fig. \ref{fig:map_based_prediction} defining the longitudinal, lateral, and vertical directions of the road. The three orthogonal axes can be further projected onto the image frame according to the extrinsic and intrinsic calibration parameters of the camera, with which the line features are selected and discriminated in the next step. At an intersection scene, several road structures are predicted in similar ways, and the image frame is subsequently partitioned into several zones corresponding to each predicted structure as illustrated in Fig. \ref{fig:intersection}.
 
 \subsubsection{RSF detection}
-In this step, a set of visual features $\mathbf{Z}_{RSF}:\{\mathbf{L}_1,\mathbf{L}_2,\mathbf{L}_3,\mathbf{P}\}$ consisting of selected line segments and points is developed, representing the  structural properties of the road. Line segments are first detected using LSD\cite{von2012lsd}. With the predicted road structures, the line segments are selected and classified accordingly into three groups, i.e. $\mathbf{L}_1$, $\mathbf{L}_2$ and $\mathbf{L}_3$, with a certain number of outliers. The line features on the lane markers and road boundaries along longitudinal road direction are consisted in $\mathbf{L}_1$. Lateral road markings and even the line segmented detected on environmental vehicles contribute to $\mathbf{L}_2$. $\mathbf{L}_3$ contains those from vertical objects, such as poles and buildings. On the other hand, the feature points detected and tracked during two succeeding frames are selected in $\mathbf{P}$ at the present stage, while future work will make use of the end points of lane marker, poles by developing corresponding detection methods.
+In this step, a set of visual features $\mathbf{Z}_{RSF}:\{\mathbf{L}_1,\mathbf{L}_2,\mathbf{L}_3,\mathbf{P}\}$ consisting of selected line segments and points is developed, representing the  structural properties of the road. Line segments are first detected using a line segment detector\cite{von2012lsd}. With the predicted road structures, the line segments are selected and classified accordingly into three groups, i.e. $\mathbf{L}_1$, $\mathbf{L}_2$ and $\mathbf{L}_3$, with a certain number of outliers. The line features on the lane markers and road boundaries along longitudinal road direction are consisted in $\mathbf{L}_1$. Lateral road markings and even the line segmented detected on environmental vehicles contribute to $\mathbf{L}_2$. $\mathbf{L}_3$ contains those from vertical objects, such as poles and buildings. On the other hand, the feature points detected and tracked during two succeeding frames are selected in $\mathbf{P}$ at the present stage, while future work will make use of the end points of lane marker, poles by developing corresponding detection methods.
 
 \subsubsection{RSF-based vehicle pose estimation}
-A RSF candidate is defined as below, which is used to estimate a vehicle pose $\mathbf{x}_v$ as detailed in next section.
+A RSF candidate is defined as below, which is used to estimate a vehicle pose $\mathbf{x}_v$ as detailed in the next section.
 
 \begin{equation}
 \mathbf{C}_{RSF}=\{\mathbf{l}_1,\mathbf{l}_2\in \mathbf{L}_u, \mathbf{l}_3\in \mathbf{L}_v, u \neq v, \mathbf{p}_1,\mathbf{p}_2\in \mathbf{P}\}
@@ -173,9 +173,9 @@ With the set of RSF features $\mathbf{Z}_{RSF}$ and candidates $\{\mathbf{C}_{RS
 \hat{x_k} = \displaystyle \arg\max _{x_k^i \sim \mathbf{C}_{RSF}^i} \{ p(\mathbf{Z}_{RSF} | x_k^i) p(x_k^i|x_{k-1}) \}
 \end{equation}
 
-Each vehicle pose $\mathbf{x}_i$ estimated on a candidate $\{\mathbf{C}_{RSF}^i\}$ is evaluated, and the one that yields the maximal posterior of $p(\mathbf{Z}_{RSF} | x_k^i) p(x_k^i|x_{k-1})$ is selected. Here, $p(x_k^i|x_{k-1})$ is estimated in a Gaussian by assuming a linear vehicle motion model.
+Each vehicle pose $\mathbf{x}_i$ estimated on a candidate $\{\mathbf{C}_{RSF}^i\}$ is evaluated, and the one that yields the maximal posterior of $p(\mathbf{Z}_{RSF} | x_k^i) p(x_k^i|x_{k-1})$ is selected. Here, $p(x_k^i|x_{k-1})$ is estimated as a Gaussian distribution assuming a linear vehicle motion model.
 
-In the next section, we define a distance measure in selecting and classifying the line segments with proposed road axes in RSF detection; detail the algorithm in estimating vehicle pose on a RSF candidate; and present an analytical estimation of the likelihood measure $p(\mathbf{Z}_{RSF} | x_k^i)$ in (2).
+In the next section, we define a distance measure for selecting and classifying the line segments with proposed road axes in RSF detection; we detail the algorithm in estimating vehicle pose on a RSF candidate; and we present an analytical estimation of the likelihood measure $p(\mathbf{Z}_{RSF} | x_k^i)$ in (2).
 
 
 
@@ -225,7 +225,7 @@ In the next section, we define a distance measure in selecting and classifying t
 
 \subsection{Pose Prediction and Coordinate Transformation}
 Let $\mathbf{x}_{v} = \{\mathbf{R}_{v}, \mathbf{s}_{v}\}$ be a vehicle pose with respect to a world coordinate system, where $\mathbf{R}_{v}$ is a rotation matrix of the vehicle orientation, and $\mathbf{s}_{v}$ is a translation vector (i.e. vehicle position).
-A vehicle frame is defined as a right-hand coordinate system with its origin at the center point of the rear axle, its $x$, $y$ and $z$ axes point to the right, front and up respectively. Let $\mathbf{e}_1=(1,0,0)^T$, $\mathbf{e}_2=(0,1,0)^T$, $\mathbf{e}_3=(0,0,1)^T$ be the three unit vectors, the vehicle frame at a world coordinate system can be represented as
+A vehicle frame is defined as a right-hand coordinate system with its origin at the center point of the rear, its $x$, $y$ and $z$ axes point to the right, front and up respectively. Let $\mathbf{e}_1=(1,0,0)^T$, $\mathbf{e}_2=(0,1,0)^T$, $\mathbf{e}_3=(0,0,1)^T$ be the three unit vectors, the vehicle frame at a world coordinate system can be represented as
 \begin{equation}
 \begin{bmatrix} \mathbf{d}_x & \mathbf{d}_y & \mathbf{d}_z \end{bmatrix}
 = \mathbf{R}_v
@@ -250,7 +250,7 @@ A camera is rigidly mounted on the vehicle with its geometries well calibrated w
 
 where $\mathbf{K}$ is the camera's intrinsic matrix, $\mathbf{R}_{cv}$ and $\mathbf{s}_{cv}$ are the rotation matrix and translation vector of the camera in vehicle coordinate frame.
 
-Let $\mathbf{x}_{c} = \{\mathbf{R}_{c}, \mathbf{s}_{c}\}$ denote for a camera pose with respect to the world coordinate system. With the vehicle pose and calibration parameters, the camera pose at the frame $k$ is thus predicted as
+Let $\mathbf{x}_{c} = \{\mathbf{R}_{c}, \mathbf{s}_{c}\}$ denote a camera pose with respect to the world coordinate system. With the vehicle pose and calibration parameters, the camera pose at frame $k$ is thus predicted as
 \begin{equation}
 \hat{\mathbf{R}}_{c,k} = \hat{\mathbf{R}}_{v,k} \mathbf{R}_{cv}
 \label{eq:R_c}
@@ -260,7 +260,7 @@ Let $\mathbf{x}_{c} = \{\mathbf{R}_{c}, \mathbf{s}_{c}\}$ denote for a camera po
 \label{eq:S_c}
 \end{equation}
 
-Subsequently, a geometric primitive at the world coordinate system, e.g. a map object, can be transformed onto the image frame with the following projection matrix.
+Subsequently, a geometric primitive in the world coordinate system, e.g. a map object, can be transformed onto the image frame with the following projection matrix.
 \begin{equation}
 \mathbf{\hat{P}_{c}}=\mathbf{K}[\hat{\mathbf{R}}_{c,k}^T|-\hat{\mathbf{R}}_{c,k}^T\hat{\mathbf{s}}_{c,k}]
 \end{equation}
@@ -269,16 +269,16 @@ Subsequently, a geometric primitive at the world coordinate system, e.g. a map o
 
 Given a predicted vehicle and camera pose, road lines within the camera's vision field are retrieved from a map as illustrated in Fig. \ref{fig:map_based_prediction}. In case that the vehicle is on a straight road, one road line is obtained. At an intersection scene, a network of road lines are retrieved, with which the image plane is partitioned into several zones. For a curved road, the image plane is partitioned similarly, as a curved road can be represented using a sequence of straight road line segments. Below we describe the processing in each image zone, which corresponds to one road line.
 
-Given a road line in a map, three orthogonal unit vectors, $\mathbf{d}_j, (j=1,2,3)$, are generated representing the road's longitudinal, lateral and vertical directions (briefly "road axis"). In case of a 2D road map, flat ground is assumed. In this paper, we take the matrix representation $\mathbf{R}_r = \begin{bmatrix} \mathbf{d}_1 & \mathbf{d}_2 & \mathbf{d}_3 \end{bmatrix}$, thus $\mathbf{d}_j = \mathbf{R}_r\mathbf{e}_j$ is the direction of each road axis in world coordinate system.
+Given a road line in a map, three orthogonal unit vectors, $\mathbf{d}_j, (j=1,2,3)$, are generated representing the road's longitudinal, lateral and vertical directions (briefly "road axis"). In case of a 2D road map, flat ground is assumed. In this paper, we take the matrix representation $\mathbf{R}_r = \begin{bmatrix} \mathbf{d}_1 & \mathbf{d}_2 & \mathbf{d}_3 \end{bmatrix}$, thus $\mathbf{d}_j = \mathbf{R}_r\mathbf{e}_j$ is the direction of each road axis in the world coordinate system.
 
 \subsection{Image Line Classification for RSF Detection}
 
 After extracting line segments from the current image frame, classification is conducted to identify the image lines along each road axes in order for RSF generation.
-As a line $\mathbf{l}_i$ on the image frame corresponds to a plane $\mathbf{\pi}_i^l = \left[\mathbf{l}_i^T\mathbf{K} 0\right]^T$ on the camera frame, which has a normal of
+As a line $\mathbf{l}_i$ on the image frame corresponds to a plane $\mathbf{\pi}_i^l = \left[\mathbf{l}_i^T\mathbf{K} 0\right]^T$ on the camera frame, which has a normal $\mathbf{n}_i$ given by
 \begin{equation}
 \mathbf{n}_i=\frac{\mathbf{K}^T\mathbf{l}_i}{\left\|\mathbf{K}^T\mathbf{l}_i\right\|}
 \end{equation}
-a distance measure between an image line $\mathbf{l}_i$ and a road axis $\mathbf{R}_r\mathbf{e}_j$ is defined using the angle between $\mathbf{n}_i$ and $\mathbf{R}_r\mathbf{e}_j$, which is detailed at below.
+A distance measure between an image line $\mathbf{l}_i$ and a road axis $\mathbf{R}_r\mathbf{e}_j$ is defined using the angle between $\mathbf{n}_i$ and $\mathbf{R}_r\mathbf{e}_j$, which is detailed at below.
 \begin{equation}
 d^2(\mathbf{l}_i,\mathbf{R}_r\mathbf{e}_j) = {\left(\mathbf{n}_i^T\mathbf{R}_c^T\mathbf{R}_r\mathbf{e}_j\right)}^2 = { \left(\frac  {\mathbf{l}_i^T\mathbf{K}\mathbf{R}_c^T\mathbf{R}_r\mathbf{e}_j}
                 {\left\|\mathbf{K}^T\mathbf{l}_i\right\|}
@@ -293,16 +293,15 @@ For a line segment $\mathbf{l}_i$, a matched road axis is found if it has the sh
 Given a RSF candidate as define in (1), where $\mathbf{l}_1,\mathbf{l}_2\in \mathbf{L}_u$ matches with the road axis, corresponding to two parallel lines in real world; $\mathbf{l}_3\in \mathbf{L}_v$ representing a real world line that is vertical to the former two. Two feature points, which have been tracked from the previous frame, are consisted in the RSF candidate too.
 
 Let $\hat{\mathbf{d}}_1$, $\hat{\mathbf{d}}_2$, $\hat{\mathbf{d}}_3$ be the predicted directions of the line segments. Here we have $\hat{\mathbf{d}}_1=\hat{\mathbf{d}}_2$, $\hat{\mathbf{d}}_3\cdot\hat{\mathbf{d}}_1=0$. Let $\mathbf{p}_1$ and $\mathbf{p}_2$ denote the points at the current frame, while $\mathbf{p}_1^\prime$ and $\mathbf{p}_2^\prime$ be those at the previous frame.
-The projection matrix of camera is 
+The projection matrix to be estimated is
 \begin{equation}
 \mathbf{P}_c = \mathbf{K}[\mathbf{R}|\mathbf{t}] = \mathbf{K}[\mathbf{R}_c^T|-\mathbf{R}_c^T\mathbf{s}_c]
 \end{equation}
 
-In this research, the line features of a RSF candidate are used to find the rotation matrix first, and the points are exploited to estimate the translation vector next.
+In this research, the line features of a RSF candidate are used to find the rotation matrix, and the points are exploited to estimate the translation vector.
 
 \subsubsection{Rotation Calculation}
-
-In case that free of error, distance between the image lines and their directions should be 0. So that we have
+Based on the distance measure between the line segments and their directions, we have
 \begin{equation}
 \mathbf{l}_1^T\mathbf{K}\mathbf{R}\hat{\mathbf{d}}_1=0, \mathbf{l}_2^T\mathbf{K}\mathbf{R}\hat{\mathbf{d}}_2=0
 \label{eq:l_1,l_2}
@@ -363,7 +362,7 @@ where
 As the rotation matrix is calculated, two tracked points $\mathbf{p}_1,\mathbf{p}_2$ are enough to calculate the relative translation $\mathbf{t}_{rel}$ using (\ref{eq:pFp}). The solution of $\mathbf{t}_{rel}$ is up to scale which can be solved using the speed data of the vehicle provided by the encoder on the wheel.
 
 \subsection{Likelihood measure}
-To measure the likelihood $p(\mathbf{Z}_{RSF} | x_k^i)$ is to measure the observation errors for the features.
+Measuring the likelihood $p(\mathbf{Z}_{RSF} | x_k^i)$ consists in measuring the observation errors for the features.
 \begin{equation}
 E= E_\mathbf{l} + \lambda E_\mathbf{p}
 \end{equation}
@@ -382,21 +381,21 @@ E_\mathbf{p} = \sum_{i} \left[ d^2 (\mathbf{p}, \mathbf{F} \mathbf{p}^\prime)
 where $d (\mathbf{p}, \mathbf{F} \mathbf{p}^\prime)$ is the distance from $\mathbf{p}$ to the epipolar line $\mathbf{F} \mathbf{p}^\prime$.
 
 \subsection{Robustness Concerns}
-As addressed previously, in estimating a vehicle (or camera) pose, the typical sample of RSF should contains at least three line segments $\mathbf{l}_1,\mathbf{l}_2,\mathbf{l}_3$ with $\mathbf{d}_1=\mathbf{d}_2,\mathbf{d}_1\cdot \mathbf{d}_3=0$, and two points tracked from the previous frame (see Fig. \ref{fig:features_for_estimation}).
-However, in a complex dynamic environment, such a requirement might not be met due to less types of dominant features, e.g. only the line segments on longitude directions are detected, or reliable point tracking on static object is not enough, etc. In order to improve the robustness of the approach for the frames with less number of features, simplified methods are developed using a prior knowledge of the vehicle motion model or horizontal vehicle motion assumption.
+As addressed previously, in estimating a vehicle (or camera) pose, the RSF candidate should contain at least three line segments $\mathbf{l}_1,\mathbf{l}_2,\mathbf{l}_3$ with $\mathbf{d}_1=\mathbf{d}_2,\mathbf{d}_1\cdot \mathbf{d}_3=0$, and two points tracked from the previous frame (see Fig. \ref{fig:features_for_estimation}).
+However, in a complex dynamic environment, such a requirement might not be met due to fewer types of dominant features, e.g. only the line segments on longitude directions are detected, or reliable point tracking on static object is not enough, etc. In order to improve the robustness of the approach for the frames with less number of features, simplified methods are developed using a prior knowledge of the vehicle motion model or horizontal vehicle motion assumption.
 
-For the situation with few buildings, road lamps or vehicles, only line segments with road's longitude direction can be detected. In that case, the road could be assumed to be planar, so the rotation matrix $\mathbf{R}$ has only one degree of freedom and can be solved using one equation $\mathbf{l}_1^T\mathbf{K}\mathbf{R}\mathbf{d}_1=0$.
+For situations with few buildings, road lamps or vehicles, only line segments with road's longitude direction can be detected. In that case, the road could be assumed to be planar, so the rotation matrix $\mathbf{R}$ has only one degree of freedom and can be solved using one equation $\mathbf{l}_1^T\mathbf{K}\mathbf{R}\mathbf{d}_1=0$.
 %If we assume that the road is planar and the vehicle is moving smoothly without jolt, i.e. horizontal motion assumption, we can use only one line to compute the rotation. In this situation, the rotation matrix $\mathbf{R}$ has only one degree of freedom and it is easy to solve it using one equation $\mathbf{l}_1^T\mathbf{K}\mathbf{R}\mathbf{d}_1=0$.
 
 %If the road is assumed to be planar, which is suitable in most cases, only vertical lines are required to calculate the translation. It is similar to the indoor line-based localization and useful in situations with a lot buildings or road lamps along the road. This algorithm can solve the curved road situation, since vertical lines are still stable in curved road.
 
-For the heavy traffic situation, the feature points are not reliable since there are a lot of moving objects. Only the directions of line segments are stable. In that case, the rotation parameters is estimated by line segments, but the translation parameters are only predicted by the vehicle's motion model without estimation.
+For heavy traffic situations, the feature points are not reliable since there are a lot of moving objects. Only the directions of line segments are stable. In that case, the rotation matrix is estimated with line segments, while the translation vector is predicted from the vehicle's motion model without estimation.
 %If the vehicle motion model is reliable, it can be used to calculate the translation instead of points. It makes the algorithm more efficient and capable of dealing with the heavy traffic situation, as the feature points are not reliable in the situation with a lot moving objects.
 
 
 \section{Experimental Results}
 \label{sec_experiments}
-Experiments have been conducted using the video streams collected on major roads in central Beijing. As shown in Fig. \ref{fig:scenario}, the roads are structured and dynamic. The video streams were collected using an instrumented vehicle with a monocular camera on its front roof, which has a resolution of $640\times480$ pixels at a frame rate of 15fps. As an on-line localization is concerned, the video streams were processed in this research at 3fps to balance computation cost. A calibration was conducted to find geometry between the camera and the vehicle, with which an image point can be projected to a ground plane by assuming it is flat. In addition, wheel speed of the vehicle was also recorded by an encoder, which is used in the motion model to predict a vehicle pose and for dealing with the scale problem of the translation vector. A high accurate GPS/IMU navigation system is used in data collection too, which acquire reference data for validation. Future work will be addressed on extending the approach to assist GPS localization. Below we present experimental results on a data set that was collected during a driving around 600 meters.
+Experiments have been conducted using the video streams collected on major roads in central Beijing. As shown in Fig. \ref{fig:scenario}, the roads are structured and dynamic. The video streams collected using an instrumented vehicle with a monocular camera on its front roof, which has a resolution of $640\times480$ pixels at a frame rate of 15fps. As an on-line localization is concerned, the video streams were processed in this research at 3fps to balance computation cost. A calibration was conducted to find the geometry between the camera and the vehicle, with which an image point can be projected to a ground plane by assuming it is flat. In addition, wheel speed of the vehicle was also recorded by an encoder, which is used in the motion model to predict a vehicle pose and for dealing with the scale problem of the translation vector. A high accurate GPS/IMU navigation system is used in data collection too, which acquire reference data for validation. Future work will be addressed on extending the approach to assist GPS localization. Below we present experimental results on a data set that was collected during a driving of around 600 meters.
 
 \begin{figure}[t]
 \centering
@@ -418,28 +417,29 @@ Experiments have been conducted using the video streams collected on major roads
 \label{fig:yaw}
 \end{figure}
 
-In this experiment, we use the LSD method \cite{von2012lsd} to detect line segments from a monocular image, and subsequently extract road structural feature (RSF), which is used to locate the vehicle pose with a road map. We compare the performance with the monocular part of libviso2 \cite{Geiger11}\cite{Geiger2013Visual}, which is a popular visual odometry method, and GPS/IMU localization data. Vehicle trajectories of the three methods are visualized on a Google Map (start at(39.9754760, 116.3911050)) as shown in Fig. \ref{fig:scenario}, where the red dash-dot-line, blue dash-line and green line denote for that of the proposed method, libviso2 and GPS/IMU outputs. In the experimental site, the sky is open with few tall buildings, thus the GPS/IMU data is quite accurate in most cases. However, the performance of the GPS/IMU is somewhat affected by the trees at the end of the path, as shown in the "END" area in Fig. \ref{fig:scenario}, which is ignored in validation. Due to the interferences from environmental cars and the high dynamics of ego-vehicle's motion during its turn, a big error happened in vehicle pose estimation using libviso2 and the trajectories diverse after the ego-vehicle finished right turn. On the other hand, the proposed algorithm demonstrate much better result comparing to that of libviso2, where the red dash-dot-line (i.e. result of the proposed method) and the green line have nearly perfect matching. One of the major reason for this is that the proposed method use a map to constrain vehicle pose estimation, which provides a prior knowledge of the road directions. More details in positioning results are shown in Fig. \ref{fig:positions}, where only 310 frames used in validation because of the bad performance of the GPS/IMU system at the end of the travel.
+In this experiment, we use the Line Segment Detection method \cite{von2012lsd} to detect line segments from a monocular image, and subsequently extract road structural feature (RSF), which is used to locate the vehicle pose with a road map. We compare the performance with the monocular part of libviso2 \cite{Geiger11}\cite{Geiger2013Visual}, which is a popular visual odometry method, and GPS/IMU localization data. Vehicle trajectories of the three methods are visualized on a Google Map (start at(39.9754760, 116.3911050)) as shown in Fig. \ref{fig:scenario}, where the red dash-dot-line, blue dash-line and green line denote for that of the proposed method, libviso2 and GPS/IMU outputs. In the experimental site, the sky is open with few tall buildings, thus the GPS/IMU data is quite accurate in most cases. However, the performance of the GPS/IMU is somewhat affected by the trees at the end of the path, as shown in the "END" area in Fig. \ref{fig:scenario}, which is ignored in validation. Due to the interferences from environmental cars and the high dynamics of ego-vehicle's motion during its turn, a big error happened in vehicle pose estimation using libviso2 and the trajectories diverge after the ego-vehicle finished right turn. On the other hand, the proposed algorithm demonstrate much better performance comparing to that of libviso2, where the red dash-dot-line (i.e. result of the proposed method) and the green line have nearly perfect matching. One of the major reason for this is that the proposed method uses a map to constrain vehicle pose estimation, which provides a prior knowledge of the road directions. More details in positioning results are shown in Fig. \ref{fig:positions}, where only 310 frames used in validation because of the bad performance of the GPS/IMU system at the end of the travel.
 
-Estimations of the vehicle heading are plotted in Fig. \ref{fig:yaw}. It can be found out that the result of the proposed method (red dash-dot-line) is much closer to GPS/IMU data (green line), while it shows some zigzags, reflecting poor local consistencies. The main reason for this zigzags could be considered that inter-frame matching is not included in the proposed framework, which sacrifices local consistencies of the result.
+Estimations of the vehicle heading are plotted in Fig. \ref{fig:yaw}. The result of the proposed method (red dash-dot-line) is much closer to GPS/IMU data (green line), while it shows some zigzags, reflecting poor local consistencies. The main reason for this zigzags could be considered that inter-frame matching is not included, which sacrifices local consistencies of the result.
 
-\begin{table}[t]
-\caption{The position and rotation error}
-\centering
-\begin{tabular}{|r||c||c|}
-\hline
-&Mean Position Error(m) & Mean Rotation Error(deg)\\
-\hline
-libviso2 & $5.6426$ & $3.346$\\
-\hline
-our method & $0.5609$ & $0.779$\\
-\hline
-\end{tabular}
-\label{table:Error_Result}
-\end{table}
 
-The result of average error of position and heading is shown in Table. \ref{table:Error_Result}. The errors of libviso2 and the proposed method are calculated compared with GPS/IMU result in each frame. Then the results are calculated by averaging the absolute value of the errors. It shown that the proposed algorithm performs better than libviso2.
+%\begin{table}[t]
+%\caption{The position and rotation error}
+%\centering
+%\begin{tabular}{|r||c||c|}
+%\hline
+%&Mean Position Error(m) & Mean Rotation Error(deg)\\
+%\hline
+%libviso2 & $5.6426$ & $3.346$\\
+%\hline
+%our method & $0.5609$ & $0.779$\\
+%\hline
+%\end{tabular}
+%\label{table:Error_Result}
+%\end{table}
+%The result of average error of position and heading is shown in Table. \ref{table:Error_Result}. The errors of libviso2 and the proposed method are calculated compared with GPS/IMU result in each frame. Then the results are calculated by averaging the absolute value of the errors. It shown that the proposed algorithm performs better than libviso2.
 
-In order to visualize the results, a map containing road structural features can be subsequently generated as shown in Fig. \ref{fig:lineProjection}, where the line features with road's longitude direction are projected. By manual classification, lane markings, road curbs, zebra zones are represented. In that case, after overlapping ego-vehicle's trajectory on the map, the interactive behaviors, such as lane changing maneuvers, can be identified directly.
+
+In order to visualize the results, a map containing road structural features is subsequently generated as shown in Fig. \ref{fig:lineProjection}, where the line features with road's longitude direction are projected. By manual classification, lane markings, road curbs, zebra zones are represented. In that case, after overlapping ego-vehicle's trajectory on the map, the interactive behaviors, such as lane changing maneuvers, can be identified directly.
 \begin{figure*}
 \centering
 %\includegraphics[width=1\linewidth]{source//fig9.png}
@@ -448,7 +448,7 @@ In order to visualize the results, a map containing road structural features can
 \label{fig:lineProjection}
 \end{figure*}
 
-Since the proposed method uses a 2D map, while libviso2 doesn't, it seems unfair to compare them. So another experiment has been done without the help of the map by assuming that our vehicle is driving in a straight road. It takes 4 minutes and 42 seconds driving about 3000 meters with 850 frames. The results are visualized on a Google Road Map (start at(39.9544800, 116.3031370)) as shown in Fig. \ref{fig:another_result}, where the red dash-dot-line, blue dash-line and green line denote for that of the proposed method, libviso2 and GPS/IMU outputs. The result of libviso2 is quit different from the GPS data after frame 412 because of the rotation error. Fig. \ref{fig:another_rotation_result} shows that on frame 419 and frame 619, the result of the yaw from libviso2 has two big jumps, which make the trajectory quit unusual. Since the road is non-strict straight, the result of our algorithm is a little different from the real trajectory after frame 400, where the direction of the road changes several degrees, as the GPS/IMU data shows in fig \ref{fig:another_rotation_result}.
+Since the proposed method uses a 2D map, while libviso2 doesn't, an additional experiment has been done without the help of the map by assuming that our vehicle is driving in a straight road. It takes 4 minutes and 42 seconds driving about 3000 meters with 850 frames. The results are visualized on a Google Road Map (start at(39.9544800, 116.3031370)) as shown in Fig. \ref{fig:another_result}, where the red dash-dot-line, blue dash-line and green line denote for that of the proposed method, libviso2 and GPS/IMU outputs. The result of libviso2 is quite different from the GPS data after frame 412 because of the rotation error. Fig. \ref{fig:another_rotation_result} shows that on frame 419 and frame 619, the result of the yaw from libviso2 has two big jumps, which make the trajectory quit unusual. Since the road is non-strict straight, the result of our algorithm is a little different from the real trajectory after frame 400, where the direction of the road changes several degrees, as the GPS/IMU data shows in Fig. \ref{fig:another_rotation_result}.
 
 \begin{figure}[t]
 \centering
